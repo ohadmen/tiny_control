@@ -8,7 +8,7 @@
 		// Use Debian 11, Debian 9, Ubuntu 18.04 or Ubuntu 21.04 on local arm64/Apple Silicon
 		"args": { "VARIANT": "ubuntu-18.04" }
 	},
-	"runArgs": ["--cap-add=SYS_PTRACE", "--security-opt", "seccomp=unconfined"],
+	"runArgs": ["--cap-add=SYS_PTRACE", "--security-opt", "seccomp=unconfined","--device=/dev/input/js0"],
 
 	// Set *default* container specific settings.json values on container create.
 	"settings": {},
@@ -24,6 +24,8 @@
         "smilerobotics.urdf",
         "yzhang.markdown-all-in-one"
 	],
+	
+	//"mounts": ["source=/dev/input,target=/dev/input"],
 
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	// "forwardPorts": [],

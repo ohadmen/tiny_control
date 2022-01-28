@@ -3,6 +3,7 @@
 #include "rclcpp/rclcpp.hpp"
 #include "std_msgs/msg/string.hpp"
 #include "joystick_node.h"
+#include "defs.h"
 
 
 class MinimalPublisher : public rclcpp::Node
@@ -13,10 +14,11 @@ public:
       : Node("minimal_publisher")
   {
     JSevent e;
-    std::ifstream fd("/dev/input/js0", std::ifstream::in);
+    std::ifstream fd(tc::joystick_port, std::ifstream::in);
     // rclcpp::Publisher<std_msgs::msg::String>::SharedPtr publisher;
-    auto publisher = this->create_publisher<std_msgs::msg::String>("topic", 10);
-    while (true)
+    auto publisher = this->create_publisher<std_msgs::msg::String>(tc::joystick_topic, 10);
+    RCLCPP_INFO(this->get_logger(), "Starting joystick node");
+    while (rclcpp::ok())
     {
 
       fd.read(reinterpret_cast<char *>(&e), sizeof(JSevent));
@@ -34,8 +36,10 @@ public:
       {
         message.data =  "Axis: time:" + std::to_string(e.time) + " value:" + std::to_string(e.value) + " number:" + std::to_string(e.number);
       }
+      RCLCPP_INFO(this->get_logger(), "Publishing: '%s'", message.data.c_str());
       publisher->publish(message);
     }
+    RCLCPP_INFO(this->get_logger(), "exiting joystick node");
   }
 };
 
