@@ -2,16 +2,17 @@
 #include <fstream>      // std::ifstream
 #include "rclcpp/rclcpp.hpp"
 #include "std_msgs/msg/string.hpp"
+#include "controller/msg/joystick_update.hpp"   
 #include "joystick_node.h"
 #include "defs.h"
 
 
-class MinimalPublisher : public rclcpp::Node
+class JoystickListener : public rclcpp::Node
 {
 
 public:
-  MinimalPublisher()
-      : Node("minimal_publisher")
+  JoystickListener()
+      : Node("joystick_listener")
   {
     JSevent e;
     std::ifstream fd(tc::joystick_port, std::ifstream::in);
@@ -46,7 +47,7 @@ public:
 int main(int argc, char **argv)
 {
   rclcpp::init(argc, argv);
-  rclcpp::spin(std::make_shared<MinimalPublisher>());
+  rclcpp::spin(std::make_shared<JoystickListener>());
   rclcpp::shutdown();
   return 0;
 }
