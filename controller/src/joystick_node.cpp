@@ -1,9 +1,7 @@
 #include <cstdio>
 #include <fstream>      // std::ifstream
 #include "rclcpp/rclcpp.hpp"
-#include "std_msgs/msg/string.hpp"
 #include "controller/msg/joystick_update.hpp"   
-#include "joystick_node.h"
 #include "defs.h"
 
 
@@ -14,31 +12,30 @@ public:
   JoystickListener()
       : Node("joystick_listener")
   {
-    JSevent e;
+    auto event = controller::msg::JoystickUpdate();
     std::ifstream fd(tc::joystick_port, std::ifstream::in);
     // rclcpp::Publisher<std_msgs::msg::String>::SharedPtr publisher;
-    auto publisher = this->create_publisher<std_msgs::msg::String>(tc::joystick_topic, 10);
+    auto publisher = this->create_publisher<controller::msg::JoystickUpdate>(tc::joystick_topic, 10);
     RCLCPP_INFO(this->get_logger(), "Starting joystick node");
     while (rclcpp::ok())
     {
-
-      fd.read(reinterpret_cast<char *>(&e), sizeof(JSevent));
+      fd.read(reinterpret_cast<char *>(&event), sizeof(controller::msg::JoystickUpdate));
       if (!fd)
       {
         continue;
       }
-      auto message = std_msgs::msg::String();
-      if (e.type == JSevent::etype::button)
-      {
+      
+      // if (e.type == JSevent::etype::button)
+      // {
           
-        message.data =  "Button: time:" + std::to_string(e.time) + " value:" + std::to_string(e.value) + " number:" +std::to_string(e.number);
-      }
-      else
-      {
-        message.data =  "Axis: time:" + std::to_string(e.time) + " value:" + std::to_string(e.value) + " number:" + std::to_string(e.number);
-      }
-      RCLCPP_INFO(this->get_logger(), "Publishing: '%s'", message.data.c_str());
-      publisher->publish(message);
+      //   message.data =  "Button: time:" + std::to_string(e.time) + " value:" + std::to_string(e.value) + " number:" +std::to_string(e.number);
+      // }
+      // else
+      // {
+      //   message.data =  "Axis: time:" + std::to_string(e.time) + " value:" + std::to_string(e.value) + " number:" + std::to_string(e.number);
+      // }
+      // RCLCPP_INFO(this->get_logger(), "Publishing: '%s'", message.data.c_str());
+      publisher->publish(event);
     }
     RCLCPP_INFO(this->get_logger(), "exiting joystick node");
   }

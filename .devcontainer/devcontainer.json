@@ -25,7 +25,6 @@
         "yzhang.markdown-all-in-one"
 	],
 	
-	//"mounts": ["source=/dev/input,target=/dev/input"],
 
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	// "forwardPorts": [],

@@ -13,14 +13,16 @@ find_package(rosidl_default_generators REQUIRED)
 
 rosidl_generate_interfaces(${PROJECT_NAME}  "msg/JoystickUpdate.msg")
 
+
 # ------ motors_driver_node ------
-# add_executable(motors_driver_node src/motors_driver_node.cpp)
-# target_include_directories(motors_driver_node PUBLIC
-#   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-#   $<INSTALL_INTERFACE:include>)
-# ament_target_dependencies(motors_driver_node rclcpp std_msgs)
-# target_compile_features(motors_driver_node PUBLIC c_std_99 cxx_std_17)  # Require C99 and C++17
-# install(TARGETS motors_driver_node DESTINATION lib/${PROJECT_NAME})
+add_executable(motors_driver_node src/motors_driver_node.cpp)
+target_include_directories(motors_driver_node PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>)
+ament_target_dependencies(motors_driver_node rclcpp std_msgs)
+rosidl_target_interfaces(motors_driver_node ${PROJECT_NAME} "rosidl_typesupport_cpp")
+target_compile_features(motors_driver_node PUBLIC c_std_99 cxx_std_17)  # Require C99 and C++17
+install(TARGETS motors_driver_node DESTINATION lib/${PROJECT_NAME})
 
 
 # ------ joystick_node ------
@@ -29,6 +31,7 @@ target_include_directories(joystick_node PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>)
   ament_target_dependencies(joystick_node rclcpp std_msgs)
+  rosidl_target_interfaces(joystick_node ${PROJECT_NAME} "rosidl_typesupport_cpp")
   target_compile_features(joystick_node PUBLIC c_std_99 cxx_std_17)  # Require C99 and C++17
 install(TARGETS joystick_node DESTINATION lib/${PROJECT_NAME})
 
