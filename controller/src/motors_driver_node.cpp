@@ -2,47 +2,50 @@
 #include <memory>
 
 #include "rclcpp/rclcpp.hpp"
-#include "controller/msg/joystick_update.hpp"   
+#include "controller/msg/joystick_update.hpp"
 #include "defs.h"
 #include <array>
 using std::placeholders::_1;
 
 class JoystickState : public rclcpp::Node
 {
-  std::array<uint16_t,8> m_axis;
-  std::array<bool,12> m_button;
+  std::array<int16_t, 6> m_axis;
+  std::array<bool, 13> m_button;
   uint32_t m_lastUpdate;
-  public:
-    JoystickState()
-    : Node("joystick_state")
-    {
-      subscription_ = this->create_subscription<controller::msg::JoystickUpdate>(
-      tc::joystick_topic, 10, std::bind(&JoystickState::topic_callback, this, _1));
-    }
 
-  private:
-    void topic_callback(const controller::msg::JoystickUpdate::SharedPtr msg) 
-    {
-      m_lastUpdate = msg.get()->time;
-      std::string message;
-            if (msg.get()->type == 1)
-      {
-        m_button[msg.get()->number]=msg.get()->value;
-        message  =  "Button: time:" + std::to_string(msg.get()->time) + " value:" + std::to_string(msg.get()->value) + " number:" +std::to_string(msg.get()->number);
-      }
-      else
-      {
-        m_axis[msg.get()->number]=msg.get()->value;
-        message =  "Axis: time:" + std::to_string(msg.get()->time) + " value:" + std::to_string(msg.get()->value) + " number:" + std::to_string(msg.get()->number);
-      }
-      RCLCPP_INFO(this->get_logger(), "Publishing: '%s'", message.c_str());
+public:
+  JoystickState()
+      : Node("joystick_state")
+  {
+    subscription_ = this->create_subscription<controller::msg::JoystickUpdate>(
+        tc::joystick_topic, 10, std::bind(&JoystickState::topic_callback, this, _1));
+  }
 
-      
+private:
+  void topic_callback(const controller::msg::JoystickUpdate::SharedPtr msg)
+  {
+    m_lastUpdate = msg.get()->time;
+    std::string message;
+    if (msg.get()->type == 1)
+    {
+      m_button[msg.get()->number] = msg.get()->value;
     }
-    rclcpp::Subscription<controller::msg::JoystickUpdate>::SharedPtr subscription_;
+    else
+    {
+      m_axis[msg.get()->number] = msg.get()->value;
+    }
+    std::stringstream ss;
+
+    for (int i = 0; i != m_axis.size(); ++i)
+      ss << std::setw(1) << i << ":" << std::setw(6) << m_axis[i] << " ";
+    for (int i = 0; i != m_button.size(); ++i)
+      ss << std::setw(1) << i << ":" << std::setw(1) << m_button[i] << " ";
+    RCLCPP_INFO(this->get_logger(), "Joystick state:\n%s", ss.str().c_str());
+  }
+  rclcpp::Subscription<controller::msg::JoystickUpdate>::SharedPtr subscription_;
 };
 
-int main(int argc, char ** argv)
+int main(int argc, char **argv)
 {
 
   rclcpp::init(argc, argv);

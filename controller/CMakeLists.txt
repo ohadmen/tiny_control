@@ -11,6 +11,11 @@ find_package(rclcpp REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
 
+install(DIRECTORY   launch DESTINATION share/${PROJECT_NAME}
+)
+set(JETSON_GPIO_POST_INSTALL OFF CACHE BOOL "enable jetson GPIO post install script")
+add_subdirectory(external)
+
 rosidl_generate_interfaces(${PROJECT_NAME}  "msg/JoystickUpdate.msg")
 
 
@@ -23,6 +28,7 @@ ament_target_dependencies(motors_driver_node rclcpp std_msgs)
 rosidl_target_interfaces(motors_driver_node ${PROJECT_NAME} "rosidl_typesupport_cpp")
 target_compile_features(motors_driver_node PUBLIC c_std_99 cxx_std_17)  # Require C99 and C++17
 install(TARGETS motors_driver_node DESTINATION lib/${PROJECT_NAME})
+target_link_libraries(motors_driver_node JetsonGPIO::JetsonGPIO)
 
 
 # ------ joystick_node ------
